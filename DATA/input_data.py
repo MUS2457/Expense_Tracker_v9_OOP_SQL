@@ -1,4 +1,4 @@
-
+from DATA.class_methods import Expense
 
 def get_product_name():
     while True:
@@ -37,3 +37,23 @@ def get_product_price(product, category):
            continue # but not required
 
 
+def get_expenses() :
+    shopping_expenses = []
+
+    while True:
+        product_name = get_product_name()
+
+        if product_name == "exit" :
+            print("Exit the program")
+            break
+        elif product_name == "done" :
+            break
+
+        category = get_product_category(product_name)
+        price = get_product_price(product_name, category)
+
+        expense = Expense(product_name, category, price)
+
+        shopping_expenses.append(expense)
+
+    return shopping_expenses
