@@ -50,7 +50,7 @@ def budget_checker(conn):
 
     while True:
 
-        user_1 = input("Enter first date (YYYY-MM-DD) or 'exit': ").strip()
+        user_1 = input("Enter first date (YYYY-MM-DD) or 'exit' to quit : ").strip()
 
         if user_1.lower() == "exit":
             print("Quitting...")
@@ -97,5 +97,46 @@ def budget_checker(conn):
         difference = budget - total
 
         return budgets, difference
+
+
+def search_by_month(conn):
+    cursor = conn.cursor()
+    month = {}
+
+    while True:
+        user = input("Enter month (YYYY-MM) or 'exit' to quit: ").strip()
+
+        if user.lower() == "exit":
+            print("Quitting...")
+            break
+
+        cursor.execute("""
+            SELECT product, category, amount, SUM(amount) AS total
+            FROM expenses
+            WHERE strftime('%Y-%m', created_at) = ?
+            GROUP BY product, category
+            ORDER BY product
+        """, (user,))
+
+        rows = cursor.fetchall()
+
+        if not rows:
+            print("No expense records found in this specific month.")
+            continue
+        monthly_spent = 0
+
+        for row in rows:
+            product = row["product"]
+            category = row["category"]
+            total = row["total"]
+
+            monthly_spent += total
+
+            if category not in month:
+                month[category] = {}
+
+            month[category][product] = total
+
+        return month, user, monthly_spent
 
 
